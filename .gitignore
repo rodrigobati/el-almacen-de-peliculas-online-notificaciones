@@ -31,3 +31,28 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Java artifacts ###
+*.class
+*.jar
+*.war
+*.ear
+
+### Logs ###
+*.log
+logs/
+
+### OS files ###
+.DS_Store
+Thumbs.db
+
+### Temporary files ###
+*.tmp
+*.temp
+*.swp
+*.swo
+
+### Docker local artifacts ###
+.env
+.env.local
+docker-compose.override.yml
