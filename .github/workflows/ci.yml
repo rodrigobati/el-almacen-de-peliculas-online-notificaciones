@@ -28,5 +28,18 @@ jobs:
         run: find . -maxdepth 4 -name pom.xml -print
 
       - name: Run unit tests (maven)
-        working-directory: el-almacen-de-peliculas-online-notificaciones
-        run: mvn -B -ntp test
+        run: |
+          set -e
+          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
+          MODULE_DIR="$GITHUB_WORKSPACE/el-almacen-de-peliculas-online-notificaciones"
+          if [ -d "$MODULE_DIR" ]; then
+            echo "Running tests in $MODULE_DIR"
+            cd "$MODULE_DIR"
+            mvn -B -ntp test
+          else
+            echo "Module directory not found: $MODULE_DIR"
+            echo "Listing workspace contents for debugging:"
+            ls -la "$GITHUB_WORKSPACE" || true
+            find "$GITHUB_WORKSPACE" -maxdepth 4 -name pom.xml -print || true
+            exit 1
+          fi
