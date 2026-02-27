@@ -1,3 +1,10 @@
+# Ignore local env files for notificaciones module
+.env
+
+# Maven / Java defaults
+/target/
+*.class
+*.jar
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
