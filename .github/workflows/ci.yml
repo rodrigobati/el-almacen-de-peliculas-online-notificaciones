@@ -28,4 +28,5 @@ jobs:
         run: find . -maxdepth 4 -name pom.xml -print
 
       - name: Run unit tests (maven)
-        run: mvn -B -ntp -f el-almacen-de-peliculas-online-notificaciones/pom.xml test
+        working-directory: el-almacen-de-peliculas-online-notificaciones
+        run: mvn -B -ntp test
