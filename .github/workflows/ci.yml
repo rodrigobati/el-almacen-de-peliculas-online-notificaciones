@@ -29,17 +29,39 @@ jobs:
 
       - name: Run unit tests (maven)
         run: |
-          set -e
+          set -euo pipefail
           echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
-          MODULE_DIR="$GITHUB_WORKSPACE/el-almacen-de-peliculas-online-notificaciones"
-          if [ -d "$MODULE_DIR" ]; then
-            echo "Running tests in $MODULE_DIR"
-            cd "$MODULE_DIR"
+          # Possible pom locations (check common layouts):
+          CANDIDATES=(
+            "$GITHUB_WORKSPACE/pom.xml"
+            "$GITHUB_WORKSPACE/el-almacen-de-peliculas-online-notificaciones/pom.xml"
+            "$GITHUB_WORKSPACE/el-almacen-de-peliculas-online/pom.xml"
+          )
+
+          FOUND_DIR=""
+          for p in "${CANDIDATES[@]}"; do
+            if [ -f "$p" ]; then
+              FOUND_DIR=$(dirname "$p")
+              break
+            fi
+          done
+
+          # If not found in candidates, search workspace (safe fallback)
+          if [ -z "$FOUND_DIR" ]; then
+            echo "pom.xml not found in candidates, searching workspace..."
+            POM_PATH=$(find "$GITHUB_WORKSPACE" -maxdepth 4 -name pom.xml -print -quit || true)
+            if [ -n "$POM_PATH" ]; then
+              FOUND_DIR=$(dirname "$POM_PATH")
+            fi
+          fi
+
+          if [ -n "$FOUND_DIR" ]; then
+            echo "Running tests in $FOUND_DIR"
+            cd "$FOUND_DIR"
             mvn -B -ntp test
           else
-            echo "Module directory not found: $MODULE_DIR"
-            echo "Listing workspace contents for debugging:"
-            ls -la "$GITHUB_WORKSPACE" || true
+            echo "ERROR: no pom.xml found under GITHUB_WORKSPACE ($GITHUB_WORKSPACE)"
+            echo "Workspace listing for debug:" && ls -la "$GITHUB_WORKSPACE" || true
             find "$GITHUB_WORKSPACE" -maxdepth 4 -name pom.xml -print || true
             exit 1
           fi
