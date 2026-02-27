@@ -1,0 +1,31 @@
+name: CI - notificaciones (unit tests)
+
+on:
+  push:
+    branches:
+      - notificaciones
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  unit-tests:
+    name: Unit Tests (notificaciones)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 23 (Temurin) and enable Maven cache
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "23"
+          cache: maven
+
+      - name: List pom.xml files (diagnostic)
+        run: find . -maxdepth 4 -name pom.xml -print
+
+      - name: Run unit tests (maven)
+        run: mvn -B -ntp -pl el-almacen-de-peliculas-online-notificaciones test
