@@ -65,13 +65,15 @@ class TestJavaMailSender implements JavaMailSender {
 public class SmtpServicioEnvioEmailTest {
 
     @Test
-    @DisplayName("SMTP adapter sends simple mail message with expected fields")
+    @DisplayName("SMTP adapter sends branded purchase summary email")
     void smtp_sends_email() {
         TestJavaMailSender mailSender = new TestJavaMailSender();
         SmtpServicioEnvioEmail adapter = new SmtpServicioEnvioEmail(mailSender);
 
-        var detalle = new DetalleCompra(List.of(new ItemCompra("Peli", 1, new BigDecimal("100.00"))),
-                new TotalCompra(new BigDecimal("100.00"), BigDecimal.ZERO, null));
+        var detalle = new DetalleCompra(List.of(
+                new ItemCompra("Matrix", 2, new BigDecimal("100.00")),
+                new ItemCompra("Inception", 1, new BigDecimal("120.00"))),
+                new TotalCompra(new BigDecimal("320.00"), new BigDecimal("20.00"), "Descuento aplicado"));
         var notificacion = new NotificacionCompraPorEmail(
                 java.util.UUID.fromString("f8ca7f2a-41d6-4fa7-acf0-305f2d4a3557"),
                 new DestinatarioEmail("cliente@correo.com"),
@@ -82,6 +84,8 @@ public class SmtpServicioEnvioEmailTest {
 
         SimpleMailMessage sent = mailSender.last;
         assertEquals("cliente@correo.com", sent.getTo()[0]);
-        assertEquals("Compra confirmada", sent.getSubject());
+        assertEquals("El Almacén de Películas - Compra Confirmada", sent.getSubject());
+        assertEquals("Tu compra de Matrix (x2), Inception por el precio final de $300.00, ha sido confirmada.",
+                sent.getText());
     }
 }
